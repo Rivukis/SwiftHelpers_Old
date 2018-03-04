@@ -147,6 +147,18 @@ extension Dictionary where Value: Hashable {
     }
 }
 
+// MARK: - Date
+
+extension Date {
+    func isBefore(_ date: Date) -> Bool {
+        return self.compare(date) == .orderedAscending
+    }
+
+    func isAfter(_ date: Date) -> Bool {
+        return self.compare(date) == .orderedDescending
+    }
+}
+
 // MARK: - Equatable Stuff
 
 public struct EquatableArray<T: Equatable>: Equatable {
