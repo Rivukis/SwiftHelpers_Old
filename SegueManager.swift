@@ -15,29 +15,31 @@ protocol SegueManagerDelegate: class {
 }
 
 /**
- This object's makes seguing cleaner, safer, and easier to do.
-
-\<I>: The type of the enum used to list all segue identifiers. Should be definied by the `UIViewController` conforming to `SegueManagerDelegate`
+ This object makes seguing easy.
 
  Example UIViewController Implementation:
  ```
  class MyViewController: UIViewController, SegueManagerDelegate {
      enum SegueIdentifier: String {
-         case routeToSomewhere
-         case routeToSomewhereElse
+         static let showThatOneScreen = "showThatOneScreen"
+         static let showThatOtherScreen = "showThatOtherScreen"
      }
 
      var segueManager: SegueManager<SegueIdentifier>
 
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+         segueManager.prepare(for: segue, sender: sender)
+     }
+
      func doRouting() {
-         segueManager.performSegue(.routeToSomewhere) { (destinationViewController: DestinationViewController) in
+         segueManager.performSegue(SegueIdentifier.showThatOneScreen) { (destinationViewController: DestinationViewController) in
              destinationViewController.configure(with: "custom stuff")
          }
      }
  }
  ```
  */
-class SegueManager<I: RawRepresentable> where I.RawValue == String {
+class SegueManager {
     weak var delegate: SegueManagerDelegate?
     private var prepareHandlers: [String: (UIViewController) -> Void] = [:]
 
@@ -51,13 +53,13 @@ class SegueManager<I: RawRepresentable> where I.RawValue == String {
 
      Example:
      ```
-     segueManager.performSegue(.routeToSomewhere) { (destinationViewController: DestinationViewController) in
+     segueManager.performSegue("showThatOneScreen") { (destinationViewController: DestinationViewController) in
          destinationViewController.configure(with: "custom stuff")
      }
      ```
      */
-    func performSegue<VC: UIViewController>(_ identifier: I, file: StaticString = #file, line: UInt = #line, prepareHandler: @escaping (VC) -> Void) {
-        prepareHandlers[identifier.rawValue] = { (viewController: UIViewController) in
+    func performSegue<VC: UIViewController>(_ identifier: String, file: StaticString = #file, line: UInt = #line, prepareHandler: @escaping (VC) -> Void) {
+        prepareHandlers[identifier] = { (viewController: UIViewController) in
             guard let destinationViewController = viewController as? VC else {
                 fatalError("Expected destination view controller of type \(VC.self). Instead got \(type(of: viewController))", file: file, line: line)
             }
@@ -65,7 +67,7 @@ class SegueManager<I: RawRepresentable> where I.RawValue == String {
             prepareHandler(destinationViewController)
         }
 
-        delegate?.performSegue(withIdentifier: identifier.rawValue, sender: self)
+        delegate?.performSegue(withIdentifier: identifier, sender: self)
     }
 
     /**
@@ -76,11 +78,12 @@ class SegueManager<I: RawRepresentable> where I.RawValue == String {
      - important: Must call this in the `SegueManagerDelegate`'s `prepare(for:sender:)`
      */
     func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let sender = sender as? SegueManager,
-              sender === self,
-              let identifier = segue.identifier,
-              let prepareHandler = prepareHandlers[identifier] else {
-            fatalError("Should segue using SegueManager")
+        guard let sender = sender as? SegueManager, sender === self else {
+                fatalError("Should segue using SegueManager")
+        }
+
+        guard let identifier = segue.identifier, let prepareHandler = prepareHandlers[identifier] else {
+            fatalError("SegueManager: This state is not possible")
         }
 
         prepareHandler(segue.destination)
@@ -92,6 +95,7 @@ class SegueManager<I: RawRepresentable> where I.RawValue == String {
 // MARK: - Playground Example
 
 /*
+
 class BasicViewController: UIViewController {
     func configure(string: String) {
         print("\(type(of: self)) has been configured with \(string)")
@@ -107,14 +111,14 @@ class DifferentViewController: UIViewController {
 
 
 class MyViewController: UIViewController, SegueManagerDelegate {
-    enum SegueIdentifier: String {
-        case routeToBasic
-        case routeToDifferent
+    enum SegueIdentifier {
+        static let routeToBasic = "routeToBasic"
+        static let routeToDifferent = "routeToDifferent"
     }
 
-    var segueManager: SegueManager<SegueIdentifier>!
+    var segueManager: SegueManager!
 
-    func inject(segueManager: SegueManager<SegueIdentifier>) {
+    func inject(segueManager: SegueManager) {
         self.segueManager = segueManager
         segueManager.delegate = self
     }
@@ -124,13 +128,13 @@ class MyViewController: UIViewController, SegueManagerDelegate {
     }
 
     func tapBasicButton() {
-        segueManager.performSegue(.routeToBasic) { (destVC: BasicViewController) in
+        segueManager.performSegue(SegueIdentifier.routeToBasic) { (destVC: BasicViewController) in
             destVC.configure(string: "basic stuff")
         }
     }
 
     func tapDifferentButton() {
-        segueManager.performSegue(.routeToDifferent) { (destVC: DifferentViewController) in
+        segueManager.performSegue(SegueIdentifier.routeToDifferent) { (destVC: DifferentViewController) in
             destVC.configure(string: "different stuff")
         }
     }
@@ -151,7 +155,7 @@ class MyViewController: UIViewController, SegueManagerDelegate {
 
 
 let viewController = MyViewController()
-let segueManager = SegueManager<MyViewController.SegueIdentifier>()
+let segueManager = SegueManager()
 viewController.inject(segueManager: segueManager)
 
 viewController.tapBasicButton()
