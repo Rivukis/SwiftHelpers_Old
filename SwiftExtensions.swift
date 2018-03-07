@@ -32,7 +32,7 @@ extension Int {
         return Int(arc4random_uniform(to - from + 1) + from)
     }
 
-    func toThe(exp: Int) -> Int {
+    public func toThe(exp: Int) -> Int {
         var result = 1
 
         for _ in 0..<exp {
@@ -46,7 +46,7 @@ extension Int {
 // MARK: - Bool
 
 extension Bool {
-    func toInt() -> Int {
+    public func toInt() -> Int {
         return self ? 1 : 0
     }
 }
@@ -54,7 +54,7 @@ extension Bool {
 // MARK: - Array
 
 extension Array {
-    subscript(safe index: Int) -> Element? {
+    public subscript(safe index: Int) -> Element? {
         guard index >= 0 && index < count else {
             return nil
         }
@@ -136,7 +136,7 @@ extension Dictionary {
 }
 
 extension Dictionary where Value: Hashable {
-    func flip() -> [Value: Key] {
+    public func flip() -> [Value: Key] {
         var flipped: [Value: Key] = [:]
 
         self.forEach { (key, value) in
@@ -150,11 +150,11 @@ extension Dictionary where Value: Hashable {
 // MARK: - Date
 
 extension Date {
-    func isBefore(_ date: Date) -> Bool {
+    public func isBefore(_ date: Date) -> Bool {
         return self.compare(date) == .orderedAscending
     }
 
-    func isAfter(_ date: Date) -> Bool {
+    public func isAfter(_ date: Date) -> Bool {
         return self.compare(date) == .orderedDescending
     }
 }
@@ -164,7 +164,7 @@ extension Date {
 public struct EquatableArray<T: Equatable>: Equatable {
     private let wrappedArray: [T]
 
-    init?(_ array: [T]?) {
+    public init?(_ array: [T]?) {
         guard let array = array else {
             return nil
         }
@@ -180,7 +180,7 @@ public struct EquatableArray<T: Equatable>: Equatable {
 public struct EquatableDictionary<K: Hashable, V: Equatable>: Equatable {
     private let wrappedDictionary: [K: V]
 
-    init?(_ dictionary: [K: V]?) {
+    public init?(_ dictionary: [K: V]?) {
         guard let dictionary = dictionary else {
             return nil
         }
