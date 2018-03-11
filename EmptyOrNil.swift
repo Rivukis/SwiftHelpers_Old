@@ -1,7 +1,7 @@
-extension Optional where Wrapped == String  {
+extension Optional where Wrapped: Collection  {
 
     /*
-    NOTE: Since this extends Optional rather than the possible String,
+    NOTE: Since this extends Optional rather than the possible collection,
     you don't use the "?" when calling it `isEmptyOrNil()`
     Example:
       var myString: String? = ""
@@ -13,8 +13,8 @@ extension Optional where Wrapped == String  {
     
     var isEmptyOrNil: Bool {
         switch self {
-        case .some(let string):
-            return string == ""
+        case .some(let collection):
+            return collection.isEmpty
         case .none:
             return true
         }
@@ -29,7 +29,7 @@ extension Optional where Wrapped == String  {
       nonNilString: String = myString.nilIfEmpty() ?? "NEATO"     // nonNilString will equal "NEATO"
     */
     
-    func nilIfEmpty() -> String? {
+    func nilIfEmpty() -> Wrapped? {
         return isEmptyOrNil ? nil : self!
     }
 }
