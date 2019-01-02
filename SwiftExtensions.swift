@@ -62,6 +62,24 @@ extension Bool {
 // MARK: - Array
 
 extension Array {
+    public init(repeatingCalculation producer: @autoclosure () -> Array.Element, count: Int) {
+        self.init()
+        self.reserveCapacity(count)
+
+        for _ in 0..<count {
+            self.append(producer())
+        }
+    }
+
+    public init(repeatingCalculation producer: (Int) -> Array.Element, count: Int) {
+        self.init()
+        self.reserveCapacity(count)
+
+        for index in 0..<count {
+            self.append(producer(index))
+        }
+    }
+
     public subscript(safe index: Int) -> Element? {
         guard index >= 0 && index < count else {
             return nil
