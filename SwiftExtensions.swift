@@ -43,6 +43,14 @@ extension Int {
     }
 }
 
+// MARK: - UInt8 (main type used to represent a byte)
+
+extension UInt8 {
+    func toUtf8Letter() -> String {
+        return String(bytes: [self], encoding: .utf8)!
+    }
+}
+
 // MARK: - Bool
 
 extension Bool {
@@ -184,7 +192,7 @@ extension Optional where Wrapped: Collection  {
     }
 
     /*
-    This allows you to use nil coalescing to on a string, whether it's nil or just empty.
+    This allows you to use nil coalescing on a string, whether it's nil or just empty.
     Example:
       var myString: String? = ""
       var nonNilString: String = myString.nilIfEmpty() ?? "WOOT"  // nonNilString will equal "WOOT"
