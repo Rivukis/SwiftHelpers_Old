@@ -183,6 +183,10 @@ extension Date {
     public func isAfter(_ date: Date) -> Bool {
         return self.compare(date) == .orderedDescending
     }
+
+    public static func -(lhs: Date, rhs: Date) -> TimeInterval {
+        return lhs.timeIntervalSince(rhs)
+    }
 }
 
 // MARK: - Optional
