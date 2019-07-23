@@ -59,6 +59,11 @@ extension Bool {
     }
 }
 
+infix operator ^^ : LogicalConjunctionPrecedence
+private func ^^(lhs: Bool, rhs: Bool) -> Bool {
+    return (!lhs && rhs) || (lhs && !rhs)
+}
+
 // MARK: - Array
 
 extension Array {
