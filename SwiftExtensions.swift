@@ -21,6 +21,21 @@ extension String {
 
         return String(self[fromIndex..<toIndex])
     }
+
+   /*
+    This creates a unique ID and then takes the substring from 0 to length
+
+    This can useful to track recursive functions.
+    Simply add this ID to each print statement to know which print statements belong to the same function call.
+   */
+   public static func quickId(length: Int = 5) -> String {
+       guard length > 0 && length <= 36 else {
+           fatalError("length for quickId() must be 1-36, got \(length)")
+       }
+
+       let fullId = UUID().uuidString
+       return fullId.substring(to: length - 1)
+   }
 }
 
 // MARK: - Int
